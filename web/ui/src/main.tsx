@@ -50,7 +50,7 @@ interface RegisterResponse {
 }
 
 function App(): React.JSX.Element {
-  const { t, locale, setLanguage } = useTranslation();
+  const { t } = useTranslation();
   const [auth, setAuth] = useState<AuthStatus | null>(null);
   const [tab, setTab] = useState<Tab>("search");
   const [mobileNav, setMobileNav] = useState(false);
@@ -74,7 +74,7 @@ function App(): React.JSX.Element {
     setAuth(await authStatus());
   useEffect(() => {
     void refreshAuth().catch((e: unknown) =>
-      setNotice(e instanceof Error ? e.message : "Unable to reach Librarr"),
+      setNotice(e instanceof Error ? e.message : "Unable to reach Lindarr"),
     );
   }, []);
   useEffect(() => {
@@ -104,7 +104,7 @@ function App(): React.JSX.Element {
             </button>
           </>
         ) : (
-          "Loading Librarr…"
+          "Loading Lindarr…"
         )}
       </main>
     );
@@ -136,15 +136,9 @@ function App(): React.JSX.Element {
             >
               ☰
             </button>
-            <h1 className="text-lg font-bold text-white">Librarr</h1>
+            <h1 className="text-lg font-bold text-white">Lindarr</h1>
           </div>
           <div className="flex gap-3 items-center">
-            <button
-              data-action="toggleLanguage"
-              onClick={() => setLanguage(locale === "en" ? "ru" : "en")}
-            >
-              {locale === "en" ? "RU" : "EN"}
-            </button>
             <span id="header-username">{auth.username}</span>
             <span id="header-role">{auth.role}</span>
             <button
@@ -350,7 +344,7 @@ function AuthScreen({
         aria-labelledby="auth-title"
       >
         <h1 id="auth-title" className="text-xl font-bold text-white">
-          Librarr
+          Lindarr
         </h1>
         <p id="login-subtitle" className="text-sm text-slate-400 mb-5">
           {view === "register"
