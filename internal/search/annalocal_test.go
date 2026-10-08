@@ -14,6 +14,12 @@ func TestAnnaLocalSearchMergesTitleAndAuthorAndMapsMD5(t *testing.T) {
 	var calls []string
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		calls = append(calls, r.URL.RawQuery)
+		if r.URL.Query().Get("title") == "" {
+			t.Fatalf("title query parameter must be non-empty: %s", r.URL.RawQuery)
+		}
+		if r.URL.Query().Get("author") == "" {
+			t.Fatalf("author query parameter must be non-empty: %s", r.URL.RawQuery)
+		}
 		w.Header().Set("Content-Type", "application/json")
 		switch {
 		case r.URL.Query().Get("title") == "Jan Guillou":
