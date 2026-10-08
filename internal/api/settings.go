@@ -186,6 +186,13 @@ func (s *Server) handleSaveSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Re-apply persisted overrides to the live Config immediately. Download
+	// clients and search integrations keep a pointer to this Config, so updating
+	// it in place makes newly saved URLs/credentials effective without requiring
+	// a container restart. This also keeps the connection-test endpoints aligned
+	// with what the UI just saved.
+	s.cfg.ReloadSettingsFile()
+
 	username, _ := r.Context().Value(ctxUsername).(string)
 	s.db.LogActivity(username, "settings_changed", "settings", "Settings updated")
 

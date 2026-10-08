@@ -150,6 +150,41 @@ func TestSaveSettings_MaskedSentinelPreservesRealValue(t *testing.T) {
 	if got := stored["prowlarr_api_key"]; got != "REAL_SECRET_KEY" {
 		t.Errorf("real API key should have been preserved, got %v", got)
 	}
+	if got := s.cfg.ProwlarrAPIKey; got != "REAL_SECRET_KEY" {
+		t.Errorf("runtime API key should still be the preserved secret, got %q", got)
+	}
+}
+
+// Saving integration settings must update the live Config immediately. The
+// integration clients and connection-test handlers retain a pointer to this
+// Config, so leaving the startup env values here makes a successful UI save
+// appear broken until the whole container is restarted.
+func TestSaveSettings_AppliesIntegrationCredentialsToLiveConfig(t *testing.T) {
+	s, _ := settingsTestServer(t)
+
+	saveSettings(t, s, map[string]interface{}{
+		"prowlarr_url":     "http://saved-prowlarr:9696",
+		"prowlarr_api_key": "SAVED_PROWLARR_KEY",
+		"deluge_url":       "http://saved-deluge:8112",
+		"deluge_password":  "secret",
+		"torrent_client":   "deluge",
+	})
+
+	if got := s.cfg.ProwlarrURL; got != "http://saved-prowlarr:9696" {
+		t.Errorf("runtime ProwlarrURL = %q", got)
+	}
+	if got := s.cfg.ProwlarrAPIKey; got != "SAVED_PROWLARR_KEY" {
+		t.Errorf("runtime ProwlarrAPIKey = %q", got)
+	}
+	if got := s.cfg.DelugeURL; got != "http://saved-deluge:8112" {
+		t.Errorf("runtime DelugeURL = %q", got)
+	}
+	if got := s.cfg.DelugePassword; got != "secret" {
+		t.Errorf("runtime DelugePassword = %q", got)
+	}
+	if got := s.cfg.TorrentClient; got != "deluge" {
+		t.Errorf("runtime TorrentClient = %q", got)
+	}
 }
 
 // TestSaveSettings_WriteFailureDoesNotLeakPath — when the on-disk write fails
