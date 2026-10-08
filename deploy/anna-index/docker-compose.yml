@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  anna-postgres:
+    image: postgres:17
+    container_name: AnnaIndex-Postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: anna
+      POSTGRES_PASSWORD: "${ANNA_DB_PASSWORD}"
+      POSTGRES_DB: anna
+    volumes:
+      - /volume1/WDBLACK/ContainerConfigs/AnnaIndex/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anna -d anna"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks:
+      - anna-index
+
+  anna-api:
+    build:
+      context: /volume1/WDBLACK/GitHub-Bridge/anna-api
+      dockerfile: Dockerfile
+    image: anna-api:lindas-local
+    container_name: AnnaIndex-API
+    restart: unless-stopped
+    depends_on:
+      anna-postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: anna-postgres
+      POSTGRES_USER: anna
+      POSTGRES_PASSWORD: "${ANNA_DB_PASSWORD}"
+      POSTGRES_DATABASE: anna
+      POSTGRES_PORT: "5432"
+      ANNA_DOMAIN: annas-archive.gd
+      ANNA_TORRENT_DATA_DIR: /data/torrents
+      ANNA_KEEP_FILES: "false"
+      # Optional during the first smoke test only. Leave unset for the full index.
+      ANNA_ARCHIVE_ID: "${ANNA_ARCHIVE_ID:-}"
+    volumes:
+      - /volume1/WDBLACK/ContainerConfigs/AnnaIndex/torrents:/data/torrents
+    ports:
+      # The API is for LindasLibrarr on the same NAS, not the public LAN.
+      - "127.0.0.1:5051:80"
+    networks:
+      - anna-index
+
+networks:
+  anna-index:
+    name: anna-index
