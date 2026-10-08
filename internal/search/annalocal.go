@@ -133,14 +133,22 @@ func (a *AnnaLocalAPI) Search(ctx context.Context, query string) ([]models.Searc
 
 func (a *AnnaLocalAPI) searchText(ctx context.Context, title, author string) ([]annaLocalRecord, error) {
 	v := url.Values{}
-	// Both parameters are sent even when empty because anna-api marks them as
-	// required in its request schema while its DB layer intentionally ignores
-	// empty values.
-	v.Set("title", title)
-	v.Set("author", author)
+	// anna-api currently marks both text parameters as required. Its DB layer
+	// intentionally ignores whitespace-only values, so use one space for the
+	// inactive side of our title-OR-author search instead of an empty value,
+	// which Huma rejects with HTTP 422 before the request reaches PostgreSQL.
+	v.Set("title", requiredAnnaTextParam(title))
+	v.Set("author", requiredAnnaTextParam(author))
 	v.Set("limit", "50")
 	v.Set("offset", "0")
 	return a.doSearch(ctx, "/v1/search/text?"+v.Encode())
+}
+
+func requiredAnnaTextParam(value string) string {
+	if strings.TrimSpace(value) == "" {
+		return " "
+	}
+	return value
 }
 
 func (a *AnnaLocalAPI) searchISBN(ctx context.Context, isbn string) ([]annaLocalRecord, error) {
