@@ -443,9 +443,13 @@ func TestActiveTorrentClient(t *testing.T) {
 		{"none", Config{}, ""},
 		{"qb only", Config{QBUrl: "http://qb"}, "qbittorrent"},
 		{"transmission only", Config{TransmissionURL: "http://tr"}, "transmission"},
-		{"both default prefers qb", Config{QBUrl: "http://qb", TransmissionURL: "http://tr"}, "qbittorrent"},
-		{"explicit transmission", Config{QBUrl: "http://qb", TransmissionURL: "http://tr", TorrentClient: "transmission"}, "transmission"},
+		{"deluge only", Config{DelugeURL: "http://de"}, "deluge"},
+		{"all default prefers qb", Config{QBUrl: "http://qb", TransmissionURL: "http://tr", DelugeURL: "http://de"}, "qbittorrent"},
+		{"transmission and deluge default prefers transmission", Config{TransmissionURL: "http://tr", DelugeURL: "http://de"}, "transmission"},
+		{"explicit transmission", Config{QBUrl: "http://qb", TransmissionURL: "http://tr", DelugeURL: "http://de", TorrentClient: "transmission"}, "transmission"},
+		{"explicit deluge", Config{QBUrl: "http://qb", DelugeURL: "http://de", TorrentClient: "deluge"}, "deluge"},
 		{"explicit qb alias", Config{QBUrl: "http://qb", TransmissionURL: "http://tr", TorrentClient: "qbit"}, "qbittorrent"},
+		{"explicit deluge but unconfigured falls back", Config{TransmissionURL: "http://tr", TorrentClient: "deluge"}, "transmission"},
 		{"explicit transmission but unconfigured falls back", Config{QBUrl: "http://qb", TorrentClient: "transmission"}, "qbittorrent"},
 	}
 	for _, c := range cases {
@@ -461,5 +465,8 @@ func TestHasTorrentClient(t *testing.T) {
 	}
 	if !(&Config{TransmissionURL: "http://tr"}).HasTorrentClient() {
 		t.Error("transmission-only config should report a torrent client")
+	}
+	if !(&Config{DelugeURL: "http://de"}).HasTorrentClient() {
+		t.Error("deluge-only config should report a torrent client")
 	}
 }

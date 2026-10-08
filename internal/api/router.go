@@ -408,6 +408,7 @@ func (s *Server) registerAdminRoutes() {
 	s.mux.HandleFunc("POST /api/test/prowlarr", requireAdmin(s.handleTestProwlarr))
 	s.mux.HandleFunc("POST /api/test/qbittorrent", requireAdmin(s.handleTestQBittorrent))
 	s.mux.HandleFunc("POST /api/test/transmission", requireAdmin(s.handleTestTransmission))
+	s.mux.HandleFunc("POST /api/test/deluge", requireAdmin(s.handleTestDeluge))
 	s.mux.HandleFunc("POST /api/test/audiobookshelf", requireAdmin(s.handleTestAudiobookshelf))
 	s.mux.HandleFunc("POST /api/test/kavita", requireAdmin(s.handleTestKavita))
 	s.mux.HandleFunc("POST /api/test/sabnzbd", requireAdmin(s.handleTestSABnzbd))

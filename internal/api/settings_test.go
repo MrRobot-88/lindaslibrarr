@@ -32,6 +32,8 @@ func settingsTestServer(t *testing.T) (*Server, string) {
 		QBUrl:          "http://env-qbit:8080",
 		QBUser:         "admin",
 		QBPass:         "env-qb-pass",
+		DelugeURL:      "http://env-deluge:8112",
+		DelugePassword: "env-deluge-pass",
 	}
 
 	database, err := db.New(filepath.Join(dir, "test.db"))
@@ -205,6 +207,9 @@ func TestGetSettings_MasksSensitiveValues(t *testing.T) {
 	}
 	if got := resp["qb_pass"]; got != maskedValue {
 		t.Errorf("qb_pass should be masked, got %v", got)
+	}
+	if got := resp["deluge_password"]; got != maskedValue {
+		t.Errorf("deluge_password should be masked, got %v", got)
 	}
 	// Non-sensitive URL is exposed.
 	if got := resp["prowlarr_url"]; got != "http://env-prowlarr:9696" {

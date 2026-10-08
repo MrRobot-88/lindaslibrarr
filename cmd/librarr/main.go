@@ -91,8 +91,9 @@ func main() {
 	// Initialize download components.
 	qb := download.NewQBittorrentClient(cfg)
 	transmission := download.NewTransmissionClient(cfg)
+	deluge := download.NewDelugeClient(cfg)
 	sab := download.NewSABnzbdClient(cfg)
-	torrentClient := download.SelectTorrentClient(cfg, qb, transmission)
+	torrentClient := download.SelectTorrentClient(cfg, qb, transmission, deluge)
 	if torrentClient != nil {
 		slog.Info("active torrent client", "client", torrentClient.Name())
 		logImportPolicy(cfg)
@@ -122,11 +123,16 @@ func main() {
 	targets := organize.NewLibraryTargets(cfg)
 	downloadMgr := download.NewManager(cfg, database, torrentClient, sab, directDL, organizer, targets, health)
 
-	// Try to connect to qBittorrent on startup (Transmission has no persistent
-	// login — it handshakes a session id lazily on first request).
-	if cfg.ActiveTorrentClient() == "qbittorrent" {
+	// Try to authenticate persistent-session clients on startup. Transmission
+	// has no persistent login — it handshakes a session id lazily on first use.
+	switch cfg.ActiveTorrentClient() {
+	case "qbittorrent":
 		if err := qb.Login(); err != nil {
 			slog.Warn("qBittorrent initial login failed (will retry on demand)", "error", err)
+		}
+	case "deluge":
+		if err := deluge.Login(); err != nil {
+			slog.Warn("Deluge initial login failed (will retry on demand)", "error", err)
 		}
 	}
 

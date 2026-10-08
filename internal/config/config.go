@@ -178,7 +178,7 @@ type Config struct {
 	TransmissionPass string
 
 	// TorrentClient explicitly selects the active torrent backend
-	// ("qbittorrent" or "transmission"). Empty means auto-detect.
+	// ("qbittorrent", "transmission", or "deluge"). Empty means auto-detect.
 	TorrentClient string
 
 	// User Agent
@@ -520,14 +520,15 @@ func (c *Config) HasTransmission() bool {
 
 // HasTorrentClient returns true if any torrent download backend is configured.
 func (c *Config) HasTorrentClient() bool {
-	return c.HasQBittorrent() || c.HasTransmission()
+	return c.HasQBittorrent() || c.HasTransmission() || c.HasDeluge()
 }
 
 // ActiveTorrentClient resolves which torrent backend handles torrents:
-//   - an explicit, configured TORRENT_CLIENT wins ("qbittorrent"/"qbit"/"qb"
-//     or "transmission");
+//   - an explicit, configured TORRENT_CLIENT wins ("qbittorrent"/"qbit"/"qb",
+//     "transmission", or "deluge");
 //   - otherwise qBittorrent is preferred for backward compatibility;
-//   - otherwise Transmission if it alone is configured;
+//   - otherwise Transmission;
+//   - otherwise Deluge;
 //   - else "" (no torrent client).
 func (c *Config) ActiveTorrentClient() string {
 	switch strings.ToLower(strings.TrimSpace(c.TorrentClient)) {
@@ -539,12 +540,19 @@ func (c *Config) ActiveTorrentClient() string {
 		if c.HasTransmission() {
 			return "transmission"
 		}
+	case "deluge":
+		if c.HasDeluge() {
+			return "deluge"
+		}
 	}
 	if c.HasQBittorrent() {
 		return "qbittorrent"
 	}
 	if c.HasTransmission() {
 		return "transmission"
+	}
+	if c.HasDeluge() {
+		return "deluge"
 	}
 	return ""
 }
@@ -585,6 +593,8 @@ func (c *Config) applySettingsFileOverrides() {
 		"qb_url":                    &c.QBUrl,
 		"qb_user":                   &c.QBUser,
 		"qb_pass":                   &c.QBPass,
+		"deluge_url":                &c.DelugeURL,
+		"deluge_password":           &c.DelugePassword,
 		"transmission_url":          &c.TransmissionURL,
 		"transmission_user":         &c.TransmissionUser,
 		"transmission_pass":         &c.TransmissionPass,

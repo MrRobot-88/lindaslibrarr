@@ -45,6 +45,7 @@ func NormalizeBaseURL(raw string) string {
 // after a save matches the one the runtime will use.
 var BaseURLSettingKeys = []string{
 	"qb_url",
+	"deluge_url",
 	"transmission_url",
 	"prowlarr_url",
 	"sabnzbd_url",

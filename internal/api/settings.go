@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/JeremiahM37/librarr/internal/config"
+	"github.com/JeremiahM37/librarr/internal/download"
 	"github.com/JeremiahM37/librarr/internal/netutil"
 	"github.com/JeremiahM37/librarr/internal/sources"
 )
@@ -19,6 +20,7 @@ const maskedValue = "--------"
 var sensitiveKeys = map[string]bool{
 	"prowlarr_api_key":         true,
 	"qb_pass":                  true,
+	"deluge_password":          true,
 	"abs_token":                true,
 	"kavita_pass":              true,
 	"api_key":                  true,
@@ -72,6 +74,8 @@ func (s *Server) handleGetSettings(w http.ResponseWriter, _ *http.Request) {
 		"qb_url":                  s.cfg.QBUrl,
 		"qb_user":                 s.cfg.QBUser,
 		"qb_pass":                 s.cfg.QBPass,
+		"deluge_url":              s.cfg.DelugeURL,
+		"deluge_password":         s.cfg.DelugePassword,
 		"transmission_url":        s.cfg.TransmissionURL,
 		"transmission_user":       s.cfg.TransmissionUser,
 		"transmission_pass":       s.cfg.TransmissionPass,
@@ -361,6 +365,12 @@ func (s *Server) handleTestQBittorrent(w http.ResponseWriter, _ *http.Request) {
 // handleTestTransmission tests the Transmission RPC connection.
 func (s *Server) handleTestTransmission(w http.ResponseWriter, _ *http.Request) {
 	result := s.transmission.Diagnose()
+	writeJSON(w, http.StatusOK, result)
+}
+
+// handleTestDeluge tests the Deluge Web JSON-RPC connection and Label plugin.
+func (s *Server) handleTestDeluge(w http.ResponseWriter, _ *http.Request) {
+	result := download.NewDelugeClient(s.cfg).Diagnose()
 	writeJSON(w, http.StatusOK, result)
 }
 

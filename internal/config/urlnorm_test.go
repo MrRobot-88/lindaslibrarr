@@ -109,6 +109,7 @@ func TestLoad_NormalizesSettingsFileURLs(t *testing.T) {
 	// Scheme-less value for every base-URL key the settings file supports.
 	body := `{
 	  "qb_url": "qbittorrent:8080",
+	  "deluge_url": "deluge:8112",
 	  "transmission_url": "transmission:9091",
 	  "prowlarr_url": "prowlarr:9696",
 	  "sabnzbd_url": "sabnzbd:8080",
@@ -129,6 +130,7 @@ func TestLoad_NormalizesSettingsFileURLs(t *testing.T) {
 
 	got := map[string]string{
 		"qb_url":            cfg.QBUrl,
+		"deluge_url":        cfg.DelugeURL,
 		"transmission_url":  cfg.TransmissionURL,
 		"prowlarr_url":      cfg.ProwlarrURL,
 		"sabnzbd_url":       cfg.SABnzbdURL,

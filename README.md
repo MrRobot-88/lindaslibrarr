@@ -45,7 +45,7 @@ Librarr searches all configured indexers in parallel, scores results by confiden
 
 ### Download Management
 
-- **Multiple download clients** -- qBittorrent or Transmission for torrents, plus SABnzbd for Usenet
+- **Multiple download clients** -- qBittorrent, Transmission, or Deluge for torrents, plus SABnzbd for Usenet
 - **Anna's Archive membership fast download** -- optional account secret key uses `/dyn/api/fast_download.json`, with LibGen mirror fallback
 - **Request/approval workflow** -- pending, approved, searching, downloading, completed states with per-request notifications
 - **Scheduled wanted-list searches** -- the scheduler searches every monitored wanted item on an interval, runs its quality profile over the results (match score gates, format rank decides) and grabs the best acceptable release; `POST /api/scheduler/run?wait=1` runs a pass synchronously
@@ -100,7 +100,7 @@ Without Audiobookshelf or Kavita configured, the library tabs show locally impor
 - **Admin dashboard** -- library stats, source health, activity log, system info
 - **Bulk operations** -- retry or cancel multiple downloads at once
 - **File uploads** -- drag and drop ebooks/audiobooks, auto-organize and library scan
-- **Connection tests** -- verify Prowlarr, qBittorrent, SABnzbd, Audiobookshelf, Kavita connectivity
+- **Connection tests** -- verify Prowlarr, qBittorrent, Transmission, Deluge, SABnzbd, Audiobookshelf, Kavita connectivity
 
 ### Deployment
 
@@ -232,14 +232,15 @@ the identity header, the next request will sign the browser back in.
 
 ### Download Clients
 
-Librarr sends torrents to **either qBittorrent or Transmission**. Configure one,
-or configure both and choose with `TORRENT_CLIENT`. The category/save-path
-settings below apply to both (Transmission uses the category as a torrent label,
-which requires Transmission 3.0+).
+Librarr sends torrents to **qBittorrent, Transmission, or Deluge**. Configure one
+or more and choose with `TORRENT_CLIENT`. The category/save-path settings below
+apply to all three. Transmission and Deluge map Librarr categories onto torrent
+labels; Transmission requires 3.0+ and Deluge requires its built-in Label plugin
+to be enabled.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `TORRENT_CLIENT` | | Active torrent backend when both are configured: empty (auto, qBittorrent preferred), `qbittorrent`, or `transmission` |
+| `TORRENT_CLIENT` | | Active torrent backend: empty (auto: qBittorrent → Transmission → Deluge), `qbittorrent`, `transmission`, or `deluge` |
 | `QB_URL` | | qBittorrent Web UI URL |
 | `QB_USER` | `admin` | qBittorrent username |
 | `QB_PASS` | | qBittorrent password |
@@ -254,6 +255,8 @@ which requires Transmission 3.0+).
 | `TRANSMISSION_URL` | | Transmission RPC URL (e.g. `http://transmission:9091`) |
 | `TRANSMISSION_USER` | | Transmission RPC username (optional — only if RPC auth is enabled) |
 | `TRANSMISSION_PASS` | | Transmission RPC password (optional) |
+| `DELUGE_URL` | | Deluge Web UI URL (e.g. `http://deluge:8112`) |
+| `DELUGE_PASSWORD` | | Deluge Web UI password |
 | `SABNZBD_URL` | | SABnzbd URL |
 | `SABNZBD_API_KEY` | | SABnzbd API key |
 | `SABNZBD_CATEGORY` | `librarr` | NZB download category |
@@ -699,6 +702,7 @@ arrive by other routes are linked on the next pass by title and author.
 | POST | `/api/test/prowlarr` | Test Prowlarr connection |
 | POST | `/api/test/qbittorrent` | Test qBittorrent connection |
 | POST | `/api/test/transmission` | Test Transmission connection |
+| POST | `/api/test/deluge` | Test Deluge connection and Label plugin |
 | POST | `/api/test/audiobookshelf` | Test Audiobookshelf connection |
 | POST | `/api/test/kavita` | Test Kavita connection |
 | POST | `/api/test/sabnzbd` | Test SABnzbd connection |

@@ -21,7 +21,16 @@ const integrations = [
     ["annas_archive_domain", "annas_archive_secret_key"],
   ],
   ["prowlarr", "Prowlarr", ["prowlarr_url", "prowlarr_api_key"]],
-  ["qbittorrent", "qBittorrent", ["qb_url", "qb_user", "qb_pass"]],
+  [
+    "qbittorrent",
+    "qBittorrent",
+    ["qb_url", "qb_user", "qb_pass", "torrent_client"],
+  ],
+  [
+    "deluge",
+    "Deluge",
+    ["deluge_url", "deluge_password", "torrent_client"],
+  ],
   [
     "transmission",
     "Transmission",
@@ -321,11 +330,13 @@ export function GeneralSettings() {
                     <select
                       id={`setting-${key}`}
                       className={input}
-                      value={String(data[key] ?? "qbittorrent")}
+                      value={String(data[key] ?? "")}
                       onChange={(e) => edit(key, e.target.value)}
                     >
+                      <option value="">Automatic</option>
                       <option value="qbittorrent">qBittorrent</option>
                       <option value="transmission">Transmission</option>
+                      <option value="deluge">Deluge</option>
                     </select>
                   ) : (
                     <input
