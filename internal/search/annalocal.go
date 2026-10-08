@@ -38,8 +38,8 @@ type annaLocalRecord struct {
 	Year            int                       `json:"year"`
 	Languages       []string                  `json:"languages"`
 	Description     string                    `json:"description"`
-	Identifiers     []annaLocalKeyValue        `json:"identifiers"`
-	Classifications []annaLocalKeyValue        `json:"classifications"`
+	Identifiers     []annaLocalKeyValue       `json:"identifiers"`
+	Classifications []annaLocalKeyValue       `json:"classifications"`
 }
 
 type annaLocalKeyValue struct {
@@ -199,6 +199,7 @@ func annaLocalMD5(r annaLocalRecord) string {
 			if md5 := normalizeAnnaMD5(id.Value); md5 != "" {
 				return md5
 			}
+		}
 	}
 	id := strings.TrimSpace(r.ID)
 	if strings.HasPrefix(strings.ToLower(id), "md5:") {
