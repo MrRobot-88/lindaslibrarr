@@ -194,12 +194,14 @@ func TestSaveSettings_AppliesIntegrationCredentialsToLiveConfig(t *testing.T) {
 func TestSaveSettings_WriteFailureDoesNotLeakPath(t *testing.T) {
 	s, path := settingsTestServer(t)
 
-	// Make the file unwritable. WriteFile on a 0444 file returns
-	// "permission denied" with the full path in the message.
-	if err := os.WriteFile(path, []byte("{}"), 0444); err != nil {
+	// Use a directory as SettingsFile so the write fails consistently even
+	// when the test process runs as root inside a container. File mode 0444
+	// is not sufficient because root can still write it.
+	badPath := filepath.Join(filepath.Dir(path), "settings-dir")
+	if err := os.Mkdir(badPath, 0700); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
-	defer os.Chmod(path, 0600)
+	s.cfg.SettingsFile = badPath
 
 	body, _ := json.Marshal(map[string]interface{}{"prowlarr_url": "http://x:9696"})
 	req := httptest.NewRequest(http.MethodPost, "/api/settings", bytes.NewReader(body))
@@ -210,10 +212,11 @@ func TestSaveSettings_WriteFailureDoesNotLeakPath(t *testing.T) {
 	if rr.Code != http.StatusInternalServerError {
 		t.Fatalf("expected 500 on write failure, got %d: %s", rr.Code, rr.Body.String())
 	}
-	if bytes.Contains(rr.Body.Bytes(), []byte(path)) {
+	if bytes.Contains(rr.Body.Bytes(), []byte(badPath)) {
 		t.Errorf("response leaks settings file path: %s", rr.Body.String())
 	}
-	if bytes.Contains(rr.Body.Bytes(), []byte("permission denied")) {
+	if bytes.Contains(rr.Body.Bytes(), []byte("is a directory")) ||
+		bytes.Contains(rr.Body.Bytes(), []byte("permission denied")) {
 		t.Errorf("response leaks underlying OS error: %s", rr.Body.String())
 	}
 }

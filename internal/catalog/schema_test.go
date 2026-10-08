@@ -10,10 +10,16 @@ import (
 
 func TestMigrateCreatesSharedLibraryAndProfileTables(t *testing.T) {
 	db, err := sql.Open("sqlite", ":memory:")
-	if err != nil { t.Fatal(err) }
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer db.Close()
-	if _, err := db.Exec(`PRAGMA foreign_keys=ON`); err != nil { t.Fatal(err) }
-	if err := Migrate(context.Background(), db); err != nil { t.Fatal(err) }
+	if _, err := db.Exec(`PRAGMA foreign_keys=ON`); err != nil {
+		t.Fatal(err)
+	}
+	if err := Migrate(context.Background(), db); err != nil {
+		t.Fatal(err)
+	}
 
 	for _, table := range []string{
 		"catalog_books", "catalog_editions", "catalog_releases", "catalog_library_files",
@@ -31,13 +37,17 @@ func TestReactionIsPerProfileAndLibraryFileIsShared(t *testing.T) {
 	db, _ := sql.Open("sqlite", ":memory:")
 	defer db.Close()
 	db.Exec(`PRAGMA foreign_keys=ON`)
-	if err := Migrate(context.Background(), db); err != nil { t.Fatal(err) }
+	if err := Migrate(context.Background(), db); err != nil {
+		t.Fatal(err)
+	}
 
 	res, _ := db.Exec(`INSERT INTO catalog_books(canonical_key,title,author) VALUES('isbn:9780000000001','Book','Author')`)
 	bookID, _ := res.LastInsertId()
 	db.Exec(`INSERT INTO catalog_profiles(name) VALUES('Linda'),('Reader 2')`)
 	db.Exec(`INSERT INTO catalog_profile_reactions(profile_id,book_id,reaction) VALUES(1,?,1),(2,?,-1)`, bookID, bookID)
-	if _, err := db.Exec(`INSERT INTO catalog_library_files(book_id,path,language,format,content_hash) VALUES(?, '/books/book.epub','sv','epub','same')`, bookID); err != nil { t.Fatal(err) }
+	if _, err := db.Exec(`INSERT INTO catalog_library_files(book_id,path,language,format,content_hash) VALUES(?, '/books/book.epub','sv','epub','same')`, bookID); err != nil {
+		t.Fatal(err)
+	}
 	if _, err := db.Exec(`INSERT INTO catalog_library_files(book_id,path,language,format,content_hash) VALUES(?, '/books/copy.epub','sv','epub','same')`, bookID); err == nil {
 		t.Fatal("expected duplicate content hash to be rejected")
 	}

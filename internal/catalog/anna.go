@@ -102,7 +102,9 @@ func (s *Store) MarkAnnaSyncCompleted(ctx context.Context, base string, seen, wr
 
 func (s *Store) MarkAnnaSyncFailed(ctx context.Context, base string, syncErr error) error {
 	msg := ""
-	if syncErr != nil { msg = syncErr.Error() }
+	if syncErr != nil {
+		msg = syncErr.Error()
+	}
 	_, err := s.DB.ExecContext(ctx, `INSERT INTO catalog_sync_state(source,base,status,last_error)
 		VALUES('annas',?,'error',?)
 		ON CONFLICT(source) DO UPDATE SET base=excluded.base,status='error',last_error=excluded.last_error`, base, msg)

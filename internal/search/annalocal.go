@@ -30,16 +30,16 @@ type annaLocalSearchResponse struct {
 }
 
 type annaLocalRecord struct {
-	ID              string                    `json:"id"`
-	Title           string                    `json:"title"`
-	Publisher       string                    `json:"publisher"`
-	Author          string                    `json:"author"`
-	CoverURL        string                    `json:"coverURL"`
-	Year            int                       `json:"year"`
-	Languages       []string                  `json:"languages"`
-	Description     string                    `json:"description"`
-	Identifiers     []annaLocalKeyValue       `json:"identifiers"`
-	Classifications []annaLocalKeyValue       `json:"classifications"`
+	ID              string              `json:"id"`
+	Title           string              `json:"title"`
+	Publisher       string              `json:"publisher"`
+	Author          string              `json:"author"`
+	CoverURL        string              `json:"coverURL"`
+	Year            int                 `json:"year"`
+	Languages       []string            `json:"languages"`
+	Description     string              `json:"description"`
+	Identifiers     []annaLocalKeyValue `json:"identifiers"`
+	Classifications []annaLocalKeyValue `json:"classifications"`
 }
 
 type annaLocalKeyValue struct {

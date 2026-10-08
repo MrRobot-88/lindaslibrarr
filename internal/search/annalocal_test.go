@@ -26,23 +26,39 @@ func TestAnnaLocalSearchMergesTitleAndAuthorAndMapsMD5(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	a := newAnnaLocalAPI(&config.Config{UserAgent:"test-agent"}, ts.Client(), ts.URL)
+	a := newAnnaLocalAPI(&config.Config{UserAgent: "test-agent"}, ts.Client(), ts.URL)
 	got, err := a.Search(context.Background(), "Jan Guillou")
-	if err != nil { t.Fatal(err) }
-	if len(calls) != 2 { t.Fatalf("calls=%d, want 2", len(calls)) }
-	if len(got) != 2 { t.Fatalf("results=%d, want 2: %#v", len(got), got) }
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(calls) != 2 {
+		t.Fatalf("calls=%d, want 2", len(calls))
+	}
+	if len(got) != 2 {
+		t.Fatalf("results=%d, want 2: %#v", len(got), got)
+	}
 
 	var ondskanFound bool
 	for _, r := range got {
 		if r.Title == "Ondskan" {
 			ondskanFound = true
-			if r.MD5 != "0123456789abcdef0123456789abcdef" { t.Fatalf("md5=%q", r.MD5) }
-			if r.Language != "sv" { t.Fatalf("language=%q, want sv", r.Language) }
-			if r.Format != "epub" || r.MediaType != "ebook" { t.Fatalf("format/media=%q/%q", r.Format, r.MediaType) }
-			if r.Source != "annas" { t.Fatalf("source=%q", r.Source) }
+			if r.MD5 != "0123456789abcdef0123456789abcdef" {
+				t.Fatalf("md5=%q", r.MD5)
+			}
+			if r.Language != "sv" {
+				t.Fatalf("language=%q, want sv", r.Language)
+			}
+			if r.Format != "epub" || r.MediaType != "ebook" {
+				t.Fatalf("format/media=%q/%q", r.Format, r.MediaType)
+			}
+			if r.Source != "annas" {
+				t.Fatalf("source=%q", r.Source)
+			}
 		}
 	}
-	if !ondskanFound { t.Fatal("Ondskan missing") }
+	if !ondskanFound {
+		t.Fatal("Ondskan missing")
+	}
 }
 
 func TestAnnaLocalSearchISBNUsesExactEndpoint(t *testing.T) {
@@ -55,9 +71,15 @@ func TestAnnaLocalSearchISBNUsesExactEndpoint(t *testing.T) {
 	defer ts.Close()
 
 	a := newAnnaLocalAPI(&config.Config{}, ts.Client(), ts.URL)
-	if _, err := a.Search(context.Background(), "978-91-000000-0-0"); err != nil { t.Fatal(err) }
-	if len(paths) != 3 { t.Fatalf("paths=%v, want ISBN + title + author", paths) }
-	if !strings.HasPrefix(paths[0], "/v1/search/isbn?") { t.Fatalf("first path=%q", paths[0]) }
+	if _, err := a.Search(context.Background(), "978-91-000000-0-0"); err != nil {
+		t.Fatal(err)
+	}
+	if len(paths) != 3 {
+		t.Fatalf("paths=%v, want ISBN + title + author", paths)
+	}
+	if !strings.HasPrefix(paths[0], "/v1/search/isbn?") {
+		t.Fatalf("first path=%q", paths[0])
+	}
 }
 
 func TestAnnaLocalSearchReturnsHTTPError(t *testing.T) {
@@ -67,10 +89,16 @@ func TestAnnaLocalSearchReturnsHTTPError(t *testing.T) {
 	defer ts.Close()
 	a := newAnnaLocalAPI(&config.Config{}, ts.Client(), ts.URL)
 	_, err := a.Search(context.Background(), "Ondskan")
-	if err == nil || !strings.Contains(err.Error(), "HTTP 503") { t.Fatalf("err=%v", err) }
+	if err == nil || !strings.Contains(err.Error(), "HTTP 503") {
+		t.Fatalf("err=%v", err)
+	}
 }
 
 func TestBestAnnaLanguagePreference(t *testing.T) {
-	if got := bestAnnaLanguage([]string{"es", "en", "da", "sv"}); got != "sv" { t.Fatalf("got %q", got) }
-	if got := bestAnnaLanguage([]string{"fr", "de"}); got != "fr" { t.Fatalf("got %q", got) }
+	if got := bestAnnaLanguage([]string{"es", "en", "da", "sv"}); got != "sv" {
+		t.Fatalf("got %q", got)
+	}
+	if got := bestAnnaLanguage([]string{"fr", "de"}); got != "fr" {
+		t.Fatalf("got %q", got)
+	}
 }

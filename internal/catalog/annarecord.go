@@ -58,21 +58,21 @@ type AnnaSearchOnlyFields struct {
 }
 
 type AnnaCandidate struct {
-	CanonicalKey   string
-	SourceID       string
-	MD5            string
-	Title          string
-	Author         string
-	Publisher      string
-	Description    string
-	CoverURL       string
-	Year           int
-	Format         string
-	SizeBytes      int64
-	Languages      []string
-	ISBN10         []string
-	ISBN13         []string
-	Identifiers    map[string][]string
+	CanonicalKey    string
+	SourceID        string
+	MD5             string
+	Title           string
+	Author          string
+	Publisher       string
+	Description     string
+	CoverURL        string
+	Year            int
+	Format          string
+	SizeBytes       int64
+	Languages       []string
+	ISBN10          []string
+	ISBN13          []string
+	Identifiers     map[string][]string
 	Classifications map[string][]string
 }
 
@@ -155,21 +155,21 @@ func CandidateFromAnna(record AnnaRecord) (AnnaCandidate, bool) {
 	}
 
 	return AnnaCandidate{
-		CanonicalKey: canonicalKey(title, author, year, isbn13, isbn10),
-		SourceID: sourceID,
-		MD5: extractMD5(sourceID, f.IdentifiersUnified),
-		Title: title,
-		Author: author,
-		Publisher: publisher,
-		Description: cleanText(f.StrippedDescriptionBest),
-		CoverURL: strings.TrimSpace(f.CoverURLBest),
-		Year: year,
-		Format: format,
-		SizeBytes: size,
-		Languages: languages,
-		ISBN10: isbn10,
-		ISBN13: isbn13,
-		Identifiers: f.IdentifiersUnified,
+		CanonicalKey:    canonicalKey(title, author, year, isbn13, isbn10),
+		SourceID:        sourceID,
+		MD5:             extractMD5(sourceID, f.IdentifiersUnified),
+		Title:           title,
+		Author:          author,
+		Publisher:       publisher,
+		Description:     cleanText(f.StrippedDescriptionBest),
+		CoverURL:        strings.TrimSpace(f.CoverURLBest),
+		Year:            year,
+		Format:          format,
+		SizeBytes:       size,
+		Languages:       languages,
+		ISBN10:          isbn10,
+		ISBN13:          isbn13,
+		Identifiers:     f.IdentifiersUnified,
 		Classifications: f.ClassificationsUnified,
 	}, true
 }
