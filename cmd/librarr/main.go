@@ -52,8 +52,16 @@ func main() {
 	// Initialize search sources.
 	var sources []search.Searcher
 
-	// Anna's Archive (primary source).
-	sources = append(sources, search.NewAnnasArchive(cfg, httpClient))
+	// Anna's Archive. Prefer the local PostgreSQL-backed index when configured;
+	// otherwise retain the existing HTML source as a backwards-compatible
+	// fallback. Never run both for the same query: the challenged HTML request
+	// would turn an otherwise instant local search back into a 30-second wait.
+	annaLocal := search.NewAnnaLocalAPI(cfg, httpClient)
+	if annaLocal.Enabled() {
+		sources = append(sources, annaLocal)
+	} else {
+		sources = append(sources, search.NewAnnasArchive(cfg, httpClient))
+	}
 
 	// Prowlarr (ebooks, audiobooks, manga).
 	if cfg.HasProwlarr() {
